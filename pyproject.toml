@@ -13,6 +13,8 @@ dependencies = [
     "pydantic>=2.12,<3",
     "playwright>=1.55,<2",
     "python-dotenv>=1.1,<2",
+    "vectorbt==1.1.2",
+    "numpy>=2.4.6,<3",
 ]
 
 [project.scripts]

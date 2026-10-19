@@ -67,6 +67,17 @@ class EvaluationPolicy(Contract):
         return self
 
 
+class BacktestConfig(Contract):
+    """Illustrative cash-book assumptions, not inferred broker conditions."""
+
+    initial_cash: float = Field(default=100_000, gt=0)
+    currency: str = Field(default="quote", min_length=1, max_length=16)
+    fees_bps: float = Field(default=5, ge=0, lt=10_000)
+    fixed_fee: float = Field(default=0, ge=0)
+    slippage_bps: float = Field(default=2, ge=0, lt=10_000)
+    periods_per_year: float | None = Field(default=None, gt=0)
+
+
 class ResearchRequest(Contract):
     schema_version: Literal["1"] = "1"
     objective: str = Field(min_length=1)
@@ -92,6 +103,7 @@ class ResearchRequest(Contract):
     max_lookback: int = Field(default=50, ge=2, le=10000)
     sizing_units: int = Field(default=1, ge=1)
     evaluation: EvaluationPolicy = Field(default_factory=EvaluationPolicy)
+    backtest: BacktestConfig = Field(default_factory=BacktestConfig)
 
     @model_validator(mode="after")
     def check_candidates(self) -> Self:
