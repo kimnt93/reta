@@ -33,6 +33,13 @@ def test_origin_credentials_and_private_targets_are_rejected():
         NetworkPolicy(provider()).check("https://example.com/data")
 
 
+def test_details_only_provider_requires_an_explicit_content_selector():
+    config = provider(table_selector=None, detail_selector="#strategy")
+    assert config.table_selector is None
+    with pytest.raises(ValidationError, match="detail selector is required"):
+        provider(table_selector=None)
+
+
 def test_cdp_requires_consent_and_loopback():
     with pytest.raises(RetaError, match="consent"):
         validate_cdp_endpoint("http://127.0.0.1:9222", consent=False)

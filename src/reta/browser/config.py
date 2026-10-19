@@ -35,7 +35,8 @@ class ProviderConfig(Contract):
     id: str = Field(pattern=r"^[a-z][a-z0-9_]{0,39}$")
     allowed_origins: list[str] = Field(min_length=1)
     data_url: str
-    table_selector: str = Field(min_length=1)
+    table_selector: str | None = Field(default=None, min_length=1)
+    detail_selector: str | None = Field(default=None, min_length=1)
     permission: str = Field(min_length=1)
     source_type: Literal[
         "live", "paper", "backtest", "model_account", "unknown"
@@ -66,4 +67,6 @@ class ProviderConfig(Contract):
                 raise ValueError("Provider URL outside approved origins")
         if self.require_authentication and not self.authenticated_selector:
             raise ValueError("Authenticated success selector is required")
+        if not self.table_selector and not self.detail_selector:
+            raise ValueError("A table or strategy detail selector is required")
         return self

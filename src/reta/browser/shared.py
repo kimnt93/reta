@@ -58,6 +58,10 @@ def collect_shared(
     *,
     allow_private_network: bool = False,
 ) -> dict[str, Any]:
+    if not config.table_selector:
+        raise RetaError(
+            "missing_table_selector", "Shared collection requires a table"
+        )
     policy = NetworkPolicy(config, allow_private_network=allow_private_network)
     policy.check(config.data_url)
     session = _run(

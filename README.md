@@ -219,6 +219,17 @@ or each name with `_FILE`. Environment overrides `.env`; supplying both a
 nonempty value and a secret-file reference is an error. Never put values in
 prompts, command arguments, provider JSON or committed files.
 
+`.env.example` includes credential slots for all 19 inventory entries (17
+account namespaces; cTrader Copy/Store share `ctrader`, MQL5 Signals/Market
+share `mql5`). Other sites use their reviewed provider ID without a code
+change. Set `RETA_DEFAULT_USERNAME` and `RETA_DEFAULT_PASSWORD`, or their
+`_FILE` alternatives, for a shared fallback account. The fallback is selected
+only if **none** of the selected provider's four credential variables is
+nonempty. An incomplete, conflicting or unreadable provider pair fails;
+it never mixes provider and default credentials. Empty example slots do not
+disable the fallback. No credentials are built in or sent during discovery.
+These slots enable credential resolution, not site-specific connectors.
+
 Provider JSON contains reviewed origin/selector/permission metadata, not
 credentials. See `examples/providers/README.md` and the provider JSON Schema.
 Chợ Bot login fields were inspected, but authenticated export selectors and
@@ -231,6 +242,28 @@ is shipped. The executable authenticated fixture is `scripts/browser_smoke.py`.
 uv run reta browser login --provider /absolute/provider.json --headed
 uv run reta browser collect --provider /absolute/provider.json
 ```
+
+Read an inspected strategy description with a provider `detail_selector`:
+
+```sh
+uv run reta browser read --provider /absolute/provider.json
+```
+
+This saves selected visible text and approved-origin links in a hashed
+`output/details-<id>/` bundle. It excludes form controls, hidden text and
+scripts, rejects whole-page selectors, strips link queries/fragments, and
+does not follow links automatically. A details-only config can omit
+`table_selector`; table collection still requires it. Set
+`require_authentication=false` only for public content. Login still requires
+reviewed controls and a success marker. Reading a description supplies
+hypotheses or explicit-rule conversion evidence; independent positions and
+matching bars remain necessary for behavioral recovery.
+
+Provider origins, selectors, source permission and collection budgets remain
+explicit. Access to every site, every strategy or complete history cannot be
+guaranteed by environment settings. Unsupported rule families remain explicit
+no-model outcomes. REA can inspect authorized website behavior through its
+existing CLI or stdio tools; RETA performs typed numerical alpha fitting.
 
 The dedicated profile is `.reta/browser/<provider>/`, never the live default
 Chrome profile. Login needs an explicit authenticated success selector.
@@ -301,11 +334,19 @@ Baseline plans retain broader source/market research, not unavailable APIs.
 
 ### Current verification and external prerequisites
 
-`make check` passes 38 behavioral tests, formatting and lint. Actual Chromium
+`make check` passes 44 behavioral tests, formatting and lint. Actual Chromium
 smokes exercised env/_FILE login, session reuse, pagination and CDP attachment
 without closing an existing tab/browser. REA 6.7.0 completed a real stdio MCP
 initialize/tools-list handshake; no personal MCP configuration was applied.
 Installed skill scripts were invoked successfully from outside this checkout.
+
+Credential fallback and description reading are covered by the real local
+browser smoke, including secret files, whole-page rejection and form/hidden
+content exclusion. Live source review exercised REA passive inspection on
+four public pages and `browser read` on two cTrader product descriptions.
+Those sources yielded intake no-model findings: missing independent histories
+and bars, login/access limits, and unsupported/incomplete rule families.
+This does not verify authenticated marketplace exports or site-wide access.
 
 BrowserSkill 0.3.3 and its Codex skill are installed, but its doctor reports
 zero connected browsers: extension installation/pairing is still a user step.

@@ -13,6 +13,7 @@ from pydantic import ValidationError
 from reta import __version__
 from reta.artifacts import verify_bundle
 from reta.browser.config import ProviderConfig
+from reta.browser.details import read_details
 from reta.browser.playwright import BrowserOptions, collect, login
 from reta.browser.shared import collect_shared
 from reta.contracts import (
@@ -104,7 +105,7 @@ def _browser_parser(commands: Any) -> None:
         "browser", help="Authorized browser evidence"
     )
     actions = browser.add_subparsers(dest="browser_action", required=True)
-    for action in ["login", "collect", "shared"]:
+    for action in ["login", "collect", "read", "shared"]:
         selected = actions.add_parser(action)
         selected.add_argument("--provider", type=Path, required=True)
         selected.add_argument(
@@ -141,6 +142,8 @@ def _browser(args: argparse.Namespace) -> dict[str, Any]:
     try:
         if args.browser_action == "login":
             return login(provider, options)
+        if args.browser_action == "read":
+            return read_details(provider, options, args.output)
         return collect(provider, options, args.output)
     except PlaywrightError:
         raise RetaError(

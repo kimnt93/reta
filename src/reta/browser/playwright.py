@@ -261,6 +261,8 @@ def collect(
     options: BrowserOptions,
     output_root: Path,
 ) -> dict[str, Any]:
+    if not config.table_selector:
+        raise RetaError("missing_table_selector", "Configure table_selector")
     with open_page(config, options) as page:
         page.goto(config.data_url, wait_until="domcontentloaded")
         if not _authenticated(page, config):

@@ -1,0 +1,11 @@
+{
+  "id": "ctrader",
+  "allowed_origins": ["https://ctrader.com"],
+  "data_url": "https://ctrader.com/products/4336",
+  "detail_selector": "section:has(> h2:text-is(\"Description\")) > div",
+  "require_authentication": false,
+  "permission": "Public description reading for local review; no source-code license or private-history access asserted",
+  "source_type": "unknown",
+  "account_role": "unknown",
+  "max_bytes": 50000
+}

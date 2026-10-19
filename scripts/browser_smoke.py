@@ -57,6 +57,15 @@ class FixtureSite(BaseHTTPRequestHandler):
         self._html(
             "<title>Authorized fixture data</title>"
             "<h1 id='auth'>Signed in</h1>"
+            "<article id='strategy'><h2>Strategy details</h2>"
+            "<p>Long above the trailing mean; flat otherwise.</p>"
+            "<a href='/data?token=private'>History</a>"
+            "<a href='https://unapproved.invalid'>External</a>"
+            "<form>secret-form-text<input value='private-value'>"
+            "<a href='/private-form-link'>Secret form link</a></form>"
+            "<p hidden>hidden-secret-text</p>"
+            "<p style='visibility:hidden'>css-secret-text</p>"
+            "<p style='opacity:0'>opacity-secret-text</p></article>"
             "<table id='history'><tr>"
             "<th>Symbol</th><th>Time</th><th>NetQty</th></tr>"
             f"<tr><td>X</td><td>2026-01-01T0{page}:00:00Z</td>"
@@ -144,6 +153,28 @@ def run_smoke(temporary: Path, base_url: str) -> dict:
     assert collected["coverage"]["rows"] == 2
     assert collected["coverage"]["pages"] == 2
     assert collected["coverage"]["dataset_complete"] == "unknown"
+    details_config = provider(base_url)
+    details_config.pop("table_selector")
+    details_config["detail_selector"] = "#strategy"
+    config.write_text(json.dumps(details_config))
+    details = require_success(cli(["browser", "read", *common], environment))
+    detail_payload = json.loads(
+        (Path(details["bundle"]) / "details.json").read_text()
+    )
+    assert "trailing mean" in detail_payload["text"]
+    assert "secret-form-text" not in detail_payload["text"]
+    assert "hidden-secret-text" not in detail_payload["text"]
+    assert "css-secret-text" not in detail_payload["text"]
+    assert "opacity-secret-text" not in detail_payload["text"]
+    assert detail_payload["links"] == [f"{base_url}/data"]
+    details_config["detail_selector"] = "body"
+    config.write_text(json.dumps(details_config))
+    rejected = cli(["browser", "read", *common], environment)
+    assert rejected.returncode == 2
+    assert json.loads(rejected.stdout)["error"]["code"] == (
+        "unsafe_detail_selector"
+    )
+    config.write_text(json.dumps(provider(base_url)))
     for path in Path(collected["bundle"]).glob("*.json"):
         content = path.read_text()
         assert FixtureSite.password not in content
@@ -173,6 +204,26 @@ def run_smoke(temporary: Path, base_url: str) -> dict:
         )
     )
     assert file_login["status"] == "authenticated"
+    default_environment = dict(environment)
+    del default_environment["RETA_FIXTURE_USERNAME"]
+    del default_environment["RETA_FIXTURE_PASSWORD"]
+    default_environment["RETA_DEFAULT_USERNAME_FILE"] = str(username_file)
+    default_environment["RETA_DEFAULT_PASSWORD_FILE"] = str(password_file)
+    default_environment.pop("RETA_DEFAULT_USERNAME", None)
+    default_environment.pop("RETA_DEFAULT_PASSWORD", None)
+    default_login = require_success(
+        cli(
+            [
+                "browser",
+                "login",
+                *common,
+                "--state-dir",
+                str(temporary / "default-login"),
+            ],
+            default_environment,
+        )
+    )
+    assert default_login["status"] == "authenticated"
     environment["RETA_FIXTURE_PASSWORD"] = secrets.token_urlsafe(24)
     bad = cli(
         [
@@ -189,6 +240,9 @@ def run_smoke(temporary: Path, base_url: str) -> dict:
     return {
         "isolated_login": True,
         "secret_file_login": True,
+        "default_secret_file_login": True,
+        "strategy_detail_read": True,
+        "whole_page_read_rejected": True,
         "paginated_rows": 2,
         "wrong_login_needs_action": True,
         **cdp,
