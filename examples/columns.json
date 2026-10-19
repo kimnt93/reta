@@ -1,0 +1,8 @@
+{
+  "columns": {
+    "instrument_id": "Symbol",
+    "event_ts": "Time",
+    "target_units": "NetQty"
+  },
+  "timezone": "Asia/Ho_Chi_Minh"
+}

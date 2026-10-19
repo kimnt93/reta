@@ -134,3 +134,45 @@ harness, BrowserSkill and REA separately; setup targets register skills and
 preview/apply REA MCP configuration deliberately. Existing global tools are
 reused, not silently upgraded. Commit design, numerical engine, browser/security,
 and skills/setup/docs in small logical commits; push the configured remote.
+
+## Delivery evidence (2026-10-19)
+
+- Implemented modules: `src/reta/contracts.py`, `data.py`, `kernel.py`,
+  `evaluation.py`, `research.py`, `models.py`, `artifacts.py`, `browser/`,
+  `settings.py`, `skills.py` and `cli.py`. Public schemas come from the CLI,
+  not a second hand-maintained schema set.
+- `make check`: Ruff formatting/lint, pycodestyle and **23 passing behavioral
+  tests**, exercised with Python 3.14.7, Polars 2.0.0 and Playwright 1.64.0.
+- `make demo`: recovered the synthetic SMA lookback-5, two-unit alpha;
+  470 held-out known points and 59 matched transitions; direction macro-F1
+  and transition F1 both 1, normalized quantity MAE 0. These numbers describe
+  the controlled synthetic generator, not a real-market performance claim.
+- Standalone exported-module replay, bundle hash rejection, no-model outcomes,
+  unknown-interval handling and repeat research without the original input
+  directory were exercised. Bundle requests now reference bundled inputs;
+  the original request is retained separately.
+- `scripts/browser_smoke.py`: real cookie-authenticated Chromium login using
+  direct environment values and `_FILE`, subsequent-process session reuse,
+  two-page collection, failed-login needs-action behavior, and CDP collection
+  preserving an existing tab/browser. Authenticated table screenshot inspected.
+- Browser capture -> explicit column/timezone import and installed skill
+  scripts invoked from outside the repository were exercised.
+- Codex 0.163.0 reused; project-local REA 6.7.0 and BrowserSkill 0.3.3 installed.
+  Three RETA skill packs and upstream browser-skill installed for Codex.
+  A fresh harness session is needed to discover newly installed skills.
+- REA's actual stdio MCP server completed initialize/tools-list negotiation
+  with protocol 2025-11-25 and advertised 207 tools. `make rea-plan` produced
+  the Codex registration preview; personal MCP configuration was not applied.
+- BrowserSkill's CLI contracts were checked against the pinned 0.3.3 source:
+  session IDs are top-level, extraction files contain the canonical result,
+  and stop replies report failed/returned tabs. No guessed envelope aliases.
+- **External prerequisites:** BrowserSkill doctor reported zero connected
+  browsers; install/pair the extension in the intended profile to exercise
+  that backend. No live provider credentials were supplied. Chợ Bot's login
+  controls were inspected but authenticated history/free-access/permissions
+  remain unverified. The controlled local browser fixture proves neither.
+
+- Distribution smoke: built the wheel and installed it into an isolated uv
+  environment; all three packaged skill directories, reference documents and
+  executable scripts installed successfully without relying on checkout files.
+

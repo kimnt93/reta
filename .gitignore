@@ -10,7 +10,8 @@ htmlcov/
 !.env.example
 .reta/
 .tools/
-output/
+output/*
+!output/.gitkeep
 dist/
 *.egg-info/
 .agents/

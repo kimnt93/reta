@@ -1,0 +1,16 @@
+{
+  "objective": "Reconstruct an authorized alpha from observed positions",
+  "bars": "bars.parquet",
+  "observations": "observations.parquet",
+  "observation_kind": "positions",
+  "claim": "absolute_positions",
+  "source_type": "paper",
+  "source_url": "local-authorized-export",
+  "permission": "User-authorized local research export",
+  "complete_history": false,
+  "account_mode": "netting",
+  "families": ["sma_regime", "channel_breakout", "zscore_reversion"],
+  "max_trials": 100,
+  "max_lookback": 50,
+  "sizing_units": 2
+}

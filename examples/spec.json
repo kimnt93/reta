@@ -1,0 +1,10 @@
+{
+  "schema_version": "1",
+  "strategy_id": "sma-alpha",
+  "family": "sma_regime",
+  "lookback": 5,
+  "band_bps": 0,
+  "units": 2,
+  "allow_short": true,
+  "latency_ns": 0
+}
