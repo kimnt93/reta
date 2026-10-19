@@ -61,6 +61,11 @@ def test_failed_behavior_emits_no_model_instead_of_weakening_gates(tmp_path):
     result = reverse(request_path, tmp_path / "output")
     assert result["outcome"] == "no_candidate_passed"
     assert "minimum_macro_f1" in result["failed_gates"]
+    assert result["backtest"]["status"] == "completed"
+    assert [scope["scope"] for scope in result["backtest"]["scopes"]] == [
+        "full",
+        "held_out",
+    ]
     assert not (Path(result["bundle"]) / "model.py").exists()
     trials = json.loads((Path(result["bundle"]) / "trials.json").read_text())
     assert trials[0]["validation"]["macro_f1"] == 0

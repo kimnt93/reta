@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 
 import polars as pl
@@ -158,8 +157,7 @@ def test_pnl_only_publishes_no_model_report(make_bars, tmp_path):
     result = reverse(path, tmp_path / "output")
     assert result["outcome"] == "insufficient_evidence"
     bundle = Path(result["bundle"])
-    assert (
-        "PnL/equity"
-        in json.loads((bundle / "evaluation.json").read_text())["reason"]
-    )
+    assert result["backtest"]["status"] == "not_run"
+    assert "scopes" not in result["backtest"]
+    assert not (bundle / "backtest_equity.parquet").exists()
     assert not (bundle / "model.py").exists()

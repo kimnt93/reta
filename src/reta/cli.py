@@ -15,10 +15,16 @@ from reta.artifacts import verify_bundle
 from reta.browser.config import ProviderConfig
 from reta.browser.playwright import BrowserOptions, collect, login
 from reta.browser.shared import collect_shared
-from reta.contracts import AlphaSpec, ImportMapping, ResearchRequest, RetaError
+from reta.contracts import (
+    AlphaSpec,
+    BacktestConfig,
+    ImportMapping,
+    ResearchRequest,
+    RetaError,
+)
 from reta.data import import_table
 from reta.demo import run_demo
-from reta.models import convert, replay
+from reta.models import backtest_bundle, convert, replay
 from reta.research import reverse
 from reta.settings import load_environment
 from reta.skills import install_skills
@@ -47,6 +53,7 @@ def parser() -> argparse.ArgumentParser:
     )
     conversion.add_argument("--spec", type=Path, required=True)
     conversion.add_argument("--bars", type=Path, required=True)
+    conversion.add_argument("--backtest-config", type=Path)
     _output(conversion)
     positions = commands.add_parser(
         "positions", help="Replay a verified bundle"
@@ -62,11 +69,20 @@ def parser() -> argparse.ArgumentParser:
     imported.add_argument("--output", type=Path, required=True)
     inspect = commands.add_parser("inspect", help="Verify bundle hashes")
     inspect.add_argument("--bundle", type=Path, required=True)
+    backtest = commands.add_parser(
+        "backtest", help="Backtest an exported alpha"
+    )
+    backtest.add_argument("--bundle", type=Path, required=True)
+    backtest.add_argument("--bars", type=Path)
+    backtest.add_argument("--config", type=Path)
+    _output(backtest)
     schemas = commands.add_parser(
         "schema", help="Print authoritative JSON Schema"
     )
     schemas.add_argument(
-        "--kind", choices=["request", "spec", "provider"], required=True
+        "--kind",
+        choices=["request", "spec", "provider", "backtest"],
+        required=True,
     )
     _skill_parser(commands)
     _browser_parser(commands)
@@ -137,7 +153,22 @@ def dispatch(args: argparse.Namespace) -> dict[str, Any]:
     handlers = {
         "demo": lambda: run_demo(args.output),
         "reverse": lambda: reverse(args.request, args.output),
-        "convert": lambda: convert(args.spec, args.bars, args.output),
+        "convert": lambda: convert(
+            args.spec,
+            args.bars,
+            args.output,
+            backtest=BacktestConfig.model_validate_json(
+                args.backtest_config.read_text()
+            )
+            if args.backtest_config
+            else None,
+        ),
+        "backtest": lambda: backtest_bundle(
+            args.bundle,
+            args.output,
+            bars_path=args.bars,
+            config_path=args.config,
+        ),
         "positions": lambda: replay(args.bundle, args.bars, args.output),
         "inspect": lambda: verify_bundle(args.bundle),
         "skills": lambda: install_skills(args.harness, args.destination),
@@ -151,6 +182,7 @@ def dispatch(args: argparse.Namespace) -> dict[str, Any]:
             "request": ResearchRequest,
             "spec": AlphaSpec,
             "provider": ProviderConfig,
+            "backtest": BacktestConfig,
         }[args.kind].model_json_schema(),
     }
     return handlers[args.command]()

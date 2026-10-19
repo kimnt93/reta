@@ -58,9 +58,13 @@ def verify_bundle(directory: Path) -> dict[str, Any]:
     if not files:
         raise RetaError("invalid_bundle", "Bundle has no artifact hashes")
     required = set()
-    if manifest.get("kind") in {"reverse_engineering", "conversion"}:
+    if manifest.get("kind") in {
+        "reverse_engineering",
+        "conversion",
+        "backtest",
+    }:
         required.update({"evaluation.json", "bars.parquet"})
-    if manifest.get("outcome") in {"succeeded", "converted"}:
+    if manifest.get("outcome") in {"succeeded", "converted", "backtested"}:
         required.update({"model.py", "spec.json", "positions.parquet"})
     if not required.issubset(files):
         raise RetaError(
