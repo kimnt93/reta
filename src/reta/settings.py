@@ -40,6 +40,15 @@ def _secret(name: str) -> SecretStr:
 
 def provider_credentials(provider_id: str) -> Credentials:
     prefix = f"RETA_{provider_id.upper()}"
+    names = [
+        f"{prefix}_USERNAME",
+        f"{prefix}_USERNAME_FILE",
+        f"{prefix}_PASSWORD",
+        f"{prefix}_PASSWORD_FILE",
+    ]
+    # Select a whole pair; incomplete provider credentials must fail.
+    if not any(os.environ.get(name) for name in names):
+        prefix = "RETA_DEFAULT"
     return Credentials(
         username=_secret(f"{prefix}_USERNAME"),
         password=_secret(f"{prefix}_PASSWORD"),
