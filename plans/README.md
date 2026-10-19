@@ -1,8 +1,9 @@
 # RETA plans
 
 **Current build specification:**
-[07 — Skills, browser access and trading-alpha implementation](07-skills-browser-and-alpha-implementation.md).
-Read it with the root `AGENTS.md` and `README.md` before implementing changes.
+[07 — Skills, browser access and trading-alpha implementation](07-skills-browser-and-alpha-implementation.md)
+and [08 — Vectorbt backtesting](08-vectorbt-backtesting.md).
+Read them with the root `AGENTS.md` and `README.md` before implementing changes.
 
 RETA means reverse engineering **trading alphas**: discover authorized
 observations, formulate testable hypotheses, fit/evaluate behavior, and export
@@ -22,6 +23,9 @@ is supported but labeled separately from blind reconstruction.
   separate targets; registering REA MCP over stdio is an explicit setup step.
 - Numerical validation decides model promotion; the host agent supplies LLM
   reasoning. Missing evidence yields a no-model outcome, not fabricated alpha.
+- Vectorbt backtests report economic performance separately from behavioral
+  fidelity, with explicit costs, causal fills and independently funded
+  held-out runs. Missing models never produce fabricated portfolios.
 
 ## Baseline research/design references
 

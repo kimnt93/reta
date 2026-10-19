@@ -1,6 +1,6 @@
 ---
 name: reta-research
-description: Reverse engineer trading alphas from authorized signals, trades, positions or PnL using bounded Python/Polars models and held-out behavioral validation.
+description: Reverse engineer trading alphas from authorized signals, trades, positions or PnL using bounded Python/Polars models, held-out behavioral validation and vectorbt financial backtests.
 ---
 
 # Trading alpha reverse engineering
@@ -25,8 +25,9 @@ current harness, not a separate autonomous agent or an MCP requirement.
 6. Run `python scripts/reverse.py --request /absolute/request.json` from this
    skill directory, with `RETA_PROJECT_ROOT` pointing to the checkout when
    installed outside it. Alternatively use `uv run reta reverse --request`.
-7. Inspect evaluation.json, split.json, trials.json and report.md. A passing
-   result is behavioral approximation, not original source or future profit.
+7. Inspect evaluation.json, split.json, trials.json, backtest.json and report.md.
+   Read [backtest semantics](references/backtesting.md). Compare held-out
+   economics separately from fidelity; a passing result is not future profit.
 8. Replay the exported model.py with its bundled bars and compare actual
    target positions. Return the bundle path, failed/passing gates, baselines,
    coverage and limitations. All outputs go to the project's output directory.

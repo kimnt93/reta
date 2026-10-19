@@ -1,0 +1,8 @@
+{
+  "initial_cash": 100000,
+  "currency": "quote",
+  "fees_bps": 5,
+  "fixed_fee": 0,
+  "slippage_bps": 2,
+  "periods_per_year": null
+}

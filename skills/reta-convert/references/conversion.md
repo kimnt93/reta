@@ -16,3 +16,10 @@ Generated positions are absolute net integer targets. Flat and unchanged
 positions are included after warmup. Rows record decision_ts and effective_ts;
 execution is no earlier than the next scheduled opening. Future prices or
 labels cannot influence earlier decisions. No broker execution is included.
+
+Conversion exports include vectorbt results in report.md and backtest.json,
+with equity/orders/trades/unfilled-attempt Parquet artifacts. Supply
+--backtest-config with explicit initial_cash, fees_bps, fixed_fee,
+slippage_bps and optional periods_per_year. Fills use effective opens; the
+last unobserved opening remains pending. No forced liquidation or profit
+claim. See plans/08-vectorbt-backtesting.md and the backtest JSON Schema.

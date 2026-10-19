@@ -7,8 +7,9 @@ agent that can read `AGENTS.md` and the bundled `SKILL.md` files.
 
 The harness supplies reasoning and source discovery. RETA supplies real
 browser/evidence scripts, deterministic fitting, held-out behavioral
-validation and model bundles. No custom RETA MCP server or embedded model API
-key is required. REA can be connected separately over **stdio MCP**.
+validation, vectorbt financial backtests and model bundles. No custom RETA
+MCP server or embedded model API key is required. REA can be connected
+separately over **stdio MCP**.
 
 ## Install
 
@@ -115,6 +116,60 @@ call an LLM, browser, RETA service or remote data provider. Do not execute
 submitted Pine/MQL/AFL/Python directly; unsupported rules need an explicit new
 typed family and independent numerical examples, not a silent approximation.
 
+## Backtesting and financial reports
+
+Reverse and conversion runs now include actual **vectorbt 1.1.2** backtests
+inside `report.md` and `backtest.json`. Reverse runs simulate full history and
+a separately initialized held-out cash book. Financial performance does not
+replace behavioral-fidelity gates or influence candidate selection.
+
+Backtest an existing exported model without modifying its source bundle:
+
+```sh
+uv run reta backtest --bundle output/reversed-<id> \
+  --config examples/backtest.json
+uv run reta convert --spec examples/spec.json --bars /absolute/bars.parquet \
+  --backtest-config examples/backtest.json
+uv run reta schema --kind backtest
+```
+
+`reta backtest` may take `--bars /absolute/new-bars.parquet`; without that
+option it uses the bundle's bars. An explicit config overrides stored
+backtest assumptions; otherwise verified stored settings are reused when
+available. This standalone command is a financial simulation, not a new
+held-out behavioral validation.
+
+For reverse runs, set the nested `backtest` object in the request. Defaults:
+initial cash 100,000 **per instrument**, fees 5 bps, fixed fee 0, slippage
+2 bps, currency label `quote`. Costs are illustrative, not inferred broker
+fees. Currency labels do not convert prices. Set `periods_per_year` explicitly
+for annualized Sharpe (for example 8,760 for a continuously traded hourly
+series); without it Sharpe is `null` with a reason, not a guessed calendar.
+
+Reports include initial/final equity, net PnL, return, maximum drawdown,
+fees, filled and unfilled attempts, closed/open trades, closed-trade win
+rate/profit factor, available Sharpe, and pending end-of-data targets.
+Engine-rejected attempts and ignored-but-unmet targets are distinguished;
+unchanged targets do not count as failed orders or incur another fee.
+
+Fills use each target's effective **open**, then mark equity at that bar's
+close. Latest decision wins when several targets share an opening. Missing
+future opens remain pending; open trades are not artificially liquidated.
+The engine uses independent flat cash books, integer units and one-times
+short cash locking, without leverage, multipliers, funding, borrow costs,
+FX, dividends or a liquidation model. It is not a futures-margin simulator.
+
+Machine-readable artifacts: `backtest_equity.parquet`,
+`backtest_orders.parquet`, `backtest_trades.parquet` and
+`backtest_rejections.parquet`, labeled by instrument and scope. All are
+covered by the bundle hash manifest. If no executable candidate could be
+fitted, the report explicitly says `not_run` rather than inventing results.
+
+Vectorbt's community package is [Apache 2.0 with Commons Clause](https://github.com/polakowo/vectorbt/blob/master/LICENSE.md);
+review its commercial-use restrictions before selling a service primarily
+based on it. The trusted exported position generator still requires only
+Polars; rerunning financial simulation uses RETA's vectorbt environment.
+
 ## Evidence and output layout
 
 Canonical bars: instrument_id, open_ts, close_ts, available_ts, next_open_ts,
@@ -141,6 +196,9 @@ A passing reverse bundle contains model.py, spec.json, positions.parquet,
 bars.parquet, original evidence, labels.parquet, portable request.json,
 source-request.json, split.json, trials.json, evaluation.json,
 requirements.txt, report.md and a hash manifest.
+Financial reports and artifacts described above are included for fitted
+candidates and conversions; unpromoted candidates are labeled by their
+original behavioral outcome.
 A conversion bundle is labeled conversion_only. A no-model bundle contains
 evidence and diagnostics but no promoted model. Bundle directories publish
 atomically and are never overwritten; replay checks artifact hashes.
@@ -238,12 +296,12 @@ prove live marketplace login or extension pairing. Exit 0 means a completed
 command; reverse returns 4 for insufficient evidence/no candidate and 3 for
 human-action prerequisites. Invalid input/capabilities return 2.
 
-Current design: `plans/07-skills-browser-and-alpha-implementation.md`.
+Current design: plans 07 (toolkit) and [08 (backtesting)](plans/08-vectorbt-backtesting.md).
 Baseline plans retain broader source/market research, not unavailable APIs.
 
 ### Current verification and external prerequisites
 
-`make check` passes 23 behavioral tests, formatting and lint. Actual Chromium
+`make check` passes 38 behavioral tests, formatting and lint. Actual Chromium
 smokes exercised env/_FILE login, session reuse, pagination and CDP attachment
 without closing an existing tab/browser. REA 6.7.0 completed a real stdio MCP
 initialize/tools-list handshake; no personal MCP configuration was applied.

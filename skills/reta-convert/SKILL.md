@@ -1,6 +1,6 @@
 ---
 name: reta-convert
-description: Convert authorized explicit trading alpha rules into typed Python/Polars position-generating models, with provenance and independent behavioral checks.
+description: Convert authorized explicit trading alpha rules into typed Python/Polars position-generating models, with provenance, vectorbt backtesting and independent behavioral checks.
 ---
 
 # Convert explicit trading rules
@@ -19,9 +19,13 @@ unknown rules from behavior alone.
 4. Write the spec and canonical bars. Run `python scripts/convert.py --spec
    /absolute/spec.json --bars /absolute/bars.parquet`, or `uv run reta convert`.
 5. Inspect output/<converted-id>/model.py, spec.json, positions.parquet,
-   evaluation.json and manifest.json. Report conversion_only, not blind recovery.
+   evaluation.json, backtest.json, report.md and manifest.json. Conversion
+   includes financial simulation, not blind recovery or held-out fidelity.
+   Supply `--backtest-config FILE` for explicit capital/cost assumptions.
 6. Independently compare against authorized reference positions using the
    research workflow before claiming equivalence. Include boundary examples
    for warmup, equality, partial exits, sessions and timing.
+   Existing bundles can be simulated with `uv run reta backtest --bundle DIR
+   --config FILE`; that command never changes the source bundle.
 
 The portable exported model requires Polars, not an LLM, browser or RETA MCP.

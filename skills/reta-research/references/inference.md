@@ -21,3 +21,7 @@ not evidence that the vendor traded one unit. No broker orders are emitted.
 Candidate hypotheses should state family, feature lookback, timing, sizing,
 supporting and contradicting evidence, and unavailable inputs. A complete
 output is either a replayable passing bundle or a precise no-model report.
+
+Vectorbt financial backtests run after the winner is frozen. Return, drawdown,
+costs and trade statistics are diagnostics, not new fitting/promotion objectives.
+Read backtesting.md for cash, fill-time, rejection and held-out semantics.

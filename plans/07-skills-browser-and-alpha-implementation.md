@@ -176,3 +176,10 @@ and skills/setup/docs in small logical commits; push the configured remote.
   environment; all three packaged skill directories, reference documents and
   executable scripts installed successfully without relying on checkout files.
 
+## Backtesting extension
+
+Plan [08](08-vectorbt-backtesting.md) adds implemented vectorbt financial
+backtests, causal execution/cost contracts, report artifacts and standalone
+bundle backtesting. The delivery evidence above records the pre-backtest
+baseline; current verification is recorded in plan 08 and the root README.
+

@@ -12,5 +12,13 @@
   "families": ["sma_regime", "channel_breakout", "zscore_reversion"],
   "max_trials": 100,
   "max_lookback": 50,
-  "sizing_units": 2
+  "sizing_units": 2,
+  "backtest": {
+    "initial_cash": 100000,
+    "currency": "quote",
+    "fees_bps": 5,
+    "fixed_fee": 0,
+    "slippage_bps": 2,
+    "periods_per_year": null
+  }
 }

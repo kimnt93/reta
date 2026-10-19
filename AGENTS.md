@@ -9,7 +9,7 @@ Do not promise original-source recovery or profitability. No broker execution.
 
 ## Entry points and authority
 
-1. Read `README.md`, `plans/07-skills-browser-and-alpha-implementation.md`,
+1. Read `README.md`, plans 07 (toolkit), plans 08 (backtesting),
    and the matching `skills/*/SKILL.md` before acting.
 2. Use `uv run reta --help`; executable behavior and typed contracts in `src/`
    are authoritative. Plans 00–06 are broader design references, not claims
@@ -59,6 +59,10 @@ Do not promise original-source recovery or profitability. No broker execution.
 - Use UTC nanosecond timestamps; final-bar availability, causal trailing
   windows and next scheduled tradable open. Outputs are absolute net targets,
   not order deltas. Preserve flat and unchanged decisions after warmup.
+- Backtest with vectorbt after candidate selection. Keep financial results
+  separate from fidelity gates; include configured costs and rejected/unmet
+  targets. Held-out books start flat with fresh capital and no training orders.
+  Do not force-close open trades or fill targets at an unobserved final open.
 - Validate typed input; do not execute model-written Python/Pine/MQL/AFL.
   Exported code comes from trusted finite templates and supports no network.
 - No unused queues, servers, cloud browsers, databases or agent frameworks.
